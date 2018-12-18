@@ -56,6 +56,13 @@ def add_check_numerics_ops():
   `check_numerics` op for all of its (`half`, `float`, or `double`) inputs
   is guaranteed to run before the `check_numerics` op on any of its outputs.
 
+  Note: Checking every tensor might not necessarily lead to the expected results.
+  Many graphs have a few nodes which can legally contain NaN or Inf,
+  e.g. when they appear in a conditional branch (@{tf.select}) that is not used in the end.
+  A typical example is @{tf.pow} (also generated e.g. from `x**2`),
+  whose gradient takes the logarithm of `x` even if `y` is a constant,
+  failing for non-negative `x` despite having a well-defined gradient.
+
   Note: This API is not compatible with the use of @{tf.cond} or
   @{tf.while_loop}, and will raise a `ValueError` if you attempt to call it
   in such a graph.
